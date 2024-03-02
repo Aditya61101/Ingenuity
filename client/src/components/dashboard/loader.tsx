@@ -4,7 +4,7 @@ export const Loader = () => {
             <div className="w-10 h-10 relative animate-spin">
                 <img
                     alt="Logo"
-                    src="src/assets/logo.png"
+                    src="/logo.png"
                 />
             </div>
             <p className="text-sm text-muted-foreground">

@@ -3,21 +3,24 @@ import { Heading } from "@/components/dashboard/heading";
 import { Loader } from "@/components/dashboard/loader";
 import { UserAvatar } from "@/components/dashboard/userAvatar";
 import { BotAvatar } from "@/components/dashboard/botAvatar";
+import Empty from "@/components/dashboard/empty";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { MessageSquare } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@clerk/clerk-react";
+import axios from "axios";
+import { ChatCompletionUserMessageParam } from 'openai/resources/chat/index.mjs';
 
 const Conversation = () => {
 
-  const navigate = useNavigate();
-  // const [messages, setMessages] = useState<ChatCompletionRequestMessage[]>([]);
-  const [messages, setMessages] = useState([]);
+  const { userId } = useAuth();
+
+  const [messages, setMessages] = useState<ChatCompletionUserMessageParam[]>([]);
 
   const formSchema = z.object({
     prompt: z.string().min(1, {
@@ -34,23 +37,27 @@ const Conversation = () => {
   const isLoading = form.formState.isSubmitting;
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log('values', values);
-    // try {
-    //   const userMessage: ChatCompletionRequestMessage = { role: "user", content: values.prompt };
-    //   const newMessages = [...messages, userMessage];
-      
-    //   const response = await axios.post('/api/conversation', { messages: newMessages });
-    //   setMessages((current) => [...current, userMessage, response.data]);
-      
-    //   form.reset();
-    // } catch (error: any) {
-    //   if (error?.response?.status === 403) {
-    //     proModal.onOpen();
-    //   } else {
-    //     toast.error("Something went wrong.");
-    //   }
-    // } finally {
-    //   navigate(0);
-    // }
+    try {
+      const userMessage: ChatCompletionUserMessageParam = { role: "user", content: values.prompt };
+      const newMessages = [...messages, userMessage];
+
+      const response = await axios.post('http://localhost:8000/api/conversation', { messages: newMessages }, {
+        headers: {
+          'x-user-id': userId
+        }
+      });
+      console.log('response', response);
+      setMessages((current) => [...current, userMessage, response.data]);
+
+      form.reset();
+    } catch (error: unknown) {
+      // if (error?.response?.status === 403) {
+      //   proModal.onOpen();
+      // } else {
+      //   toast.error("Something went wrong.");
+      // }
+      console.error('error', error);
+    }
   }
 
   return (
@@ -107,25 +114,32 @@ const Conversation = () => {
               <Loader />
             </div>
           )}
-          {/* {messages.length === 0 && !isLoading && (
+          {messages.length === 0 && !isLoading && (
             <Empty label="No conversation started." />
-          )} */}
-          {/* <div className="flex flex-col-reverse gap-y-4">
-            {messages.map((message) => (
+          )}
+          <div className="flex flex-col-reverse gap-y-4">
+            {messages.map((message, index) => (
               <div
-                key={message.content}
+                key={index}
                 className={cn(
                   "p-8 w-full flex items-start gap-x-8 rounded-lg",
                   message.role === "user" ? "bg-white border border-black/10" : "bg-muted",
                 )}
               >
                 {message.role === "user" ? <UserAvatar /> : <BotAvatar />}
-                <p className="text-sm">
-                  {message.content}
-                </p>
+                {Array.isArray(message.content)
+                  ? message.content.map((part, idx) => {
+                    if ("text" in part) {
+                      return <span key={idx}>{part.text}</span>
+                    } else{
+                      return null;
+                    }
+                  })
+                  : <p className="text-sm">{message.content}</p>
+                }
               </div>
             ))}
-          </div> */}
+          </div>
         </div>
       </div>
     </div>

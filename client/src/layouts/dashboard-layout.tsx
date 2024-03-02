@@ -5,14 +5,14 @@ import { Sidebar } from "@/components/dashboard/sidebar";
 import Navbar from "@/components/dashboard/navbar";
 
 const DashboardLayout = () => {
-    const { userId, isLoaded } = useAuth()
-    const navigate = useNavigate()
-    console.log('for testing', userId)
+    const { userId, isLoaded } = useAuth();
+    const navigate = useNavigate();
+    console.log('for testing', userId);
     useEffect(() => {
         if (!userId) {
-            navigate("/sign-in")
+            navigate("/sign-in");
         }
-    }, [])
+    }, [userId, navigate])
 
     if (!isLoaded) return "Loading..."
     return (
