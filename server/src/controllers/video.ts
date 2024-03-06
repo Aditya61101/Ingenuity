@@ -5,29 +5,28 @@ import Replicate from "replicate";
 const replicate = new Replicate({
     auth: process.env.REPLICATE_API_TOKEN,
 });
-export const generateMusic = async (req: CustomRequest, res: Response) => {
+export const generateVideo = async (req: CustomRequest, res: Response) => {
     try {
         if (!req.userId) {
-            console.log("[MUSIC POST ERROR]", "Unauthorized");
+            console.log("[VIDEO POST ERROR]", "Unauthorized");
             return res.status(401).json({ error: "Unauthorized" });
         }
-
         const { prompt } = req.body;
         if (!prompt) {
             return res.status(400).json({ error: "Prompt is required." });
         }
-        const music = await replicate.run(
-            "meta/musicgen:b05b1dff1d8c6dc63d14b0cdb42135378dcb87f6373b0d3d341ede46e59e2b38", {
+        const video = await replicate.run(
+            "anotherjesse/zeroscope-v2-xl:9f747673945c62801b13b84701c783929c0ee784e4748ec062204894dda1a351",
+            {
                 input: {
-                    prompt: prompt,
-                    duration: 11,
+                    prompt,
                 }
             }
         );
-        console.log(music);
-        return res.status(201).json(music);
+        console.log(video);
+        return res.status(201).json(video);
     } catch (error) {
-        console.log("[MUSIC POST ERROR]", error);
+        console.log("[VIDEO POST ERROR]", error);
         res.status(500).json({ error: "Internal Server Error." });
     }
 }
