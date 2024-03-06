@@ -16,7 +16,7 @@ const routes = [
         color: "text-violet-500",
     },
     {
-        label: 'img Generation',
+        label: 'Image Generation',
         icon: ImageIcon,
         color: "text-pink-700",
         href: '/dashboard/image',
