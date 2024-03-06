@@ -20,6 +20,9 @@ import Settings from './routes/dashboard/settings/page.tsx';
 //layouts
 import RootLayout from './layouts/root-layout.tsx';
 import DashboardLayout from './layouts/dashboard-layout.tsx';
+//react-redux
+import { Provider } from 'react-redux'
+import { store } from './store/index.ts';
 
 const router = createBrowserRouter([
   {
@@ -48,7 +51,9 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-      <RouterProvider router={router} />
+      <Provider store={store}>
+        <RouterProvider router={router} />
+      </Provider>
     </ThemeProvider>
   </React.StrictMode>
 )

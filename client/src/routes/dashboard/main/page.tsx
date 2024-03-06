@@ -1,16 +1,11 @@
-"use client";
-
 import { ArrowRight } from "lucide-react";
-
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-
 import { tools } from "@/constants";
 import { useNavigate } from "react-router-dom";
 
 export default function HomePage() {
   const navigate = useNavigate();
-
   return (
     <div>
       <div className="mb-8 space-y-4">

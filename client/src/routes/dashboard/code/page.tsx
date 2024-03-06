@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState } from "react";
 import { Heading } from "@/components/dashboard/heading";
@@ -17,9 +18,12 @@ import { useAuth } from "@clerk/clerk-react";
 import axios from "axios";
 import { ChatCompletionUserMessageParam } from 'openai/resources/chat/index.mjs';
 import ReactMarkdown from "react-markdown";
+import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { openModal } from "@/store/reducers/modalReducer";
 
 const CodePage = () => {
-
+  const dispatch = useDispatch();
   const { userId } = useAuth();
   const [messages, setMessages] = useState<ChatCompletionUserMessageParam[]>([]);
 
@@ -51,13 +55,13 @@ const CodePage = () => {
       setMessages((current) => [...current, userMessage, response.data]);
 
       form.reset();
-    } catch (error: unknown) {
-      // if (error?.response?.status === 403) {
-      //   proModal.onOpen();
-      // } else {
-      //   toast.error("Something went wrong.");
-      // }
+    } catch (error: any) {
       console.error('error', error);
+      if (error?.response?.status === 403) {
+        dispatch(openModal());
+      } else {
+        toast.error("Something went wrong.");
+      }
     }
   }
 

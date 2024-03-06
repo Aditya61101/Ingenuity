@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { Download, ImageIcon } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,9 +15,12 @@ import { Card, CardFooter } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { openModal } from "@/store/reducers/modalReducer";
+import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
 
 const Conversation = () => {
-
+  const dispatch = useDispatch();
   const { userId } = useAuth();
 
   const [photos, setPhotos] = useState<string[]>([]);
@@ -43,13 +47,13 @@ const Conversation = () => {
       const urls = response.data;
       setPhotos(urls);
       form.reset();
-    } catch (error: unknown) {
-      // if (error?.response?.status === 403) {
-      //   proModal.onOpen();
-      // } else {
-      //   toast.error("Something went wrong.");
-      // }
+    } catch (error: any) {
       console.error('error', error);
+      if (error?.response?.status === 403) {
+        dispatch(openModal());
+      } else {
+        toast.error("Something went wrong.");
+      }
     }
   }
 

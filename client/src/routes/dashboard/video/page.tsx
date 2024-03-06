@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import * as z from "zod";
 import axios from "axios";
@@ -11,8 +12,12 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@clerk/clerk-react";
+import { openModal } from "@/store/reducers/modalReducer";
+import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
 
 const VideoPage = () => {
+  const dispatch = useDispatch();
   const { userId } = useAuth();
   const [video, setVideo] = useState<string>();
 
@@ -41,13 +46,13 @@ const VideoPage = () => {
       console.log(response);
       setVideo(response.data[0]);
       form.reset();
-    } catch (error: unknown) {
-      console.log(error);
-      // if (error?.response?.status === 403) {
-      //   proModal.onOpen();
-      // } else {
-      //   toast.error("Something went wrong.");
-      // }
+    } catch (error: any) {
+      console.error('error', error);
+      if (error?.response?.status === 403) {
+        dispatch(openModal());
+      } else {
+        toast.error("Something went wrong.");
+      }
     }
   }
 
