@@ -4,7 +4,7 @@ import { Download, ImageIcon } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
-import { useAuth } from "@clerk/clerk-react";
+import { useUser } from "@clerk/clerk-react";
 import axios from "axios";
 import { amountOptions, formSchema, resolutionOptions } from "./constants";
 import { Heading } from "@/components/dashboard/heading";
@@ -21,8 +21,7 @@ import { useDispatch } from "react-redux";
 
 const Conversation = () => {
   const dispatch = useDispatch();
-  const { userId } = useAuth();
-
+  const { user } = useUser();
   const [photos, setPhotos] = useState<string[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -41,7 +40,8 @@ const Conversation = () => {
       setPhotos([]);
       const response = await axios.post('http://localhost:8000/api/image', values, {
         headers: {
-          'x-user-id': userId
+          'x-user-id': user?.id,
+          'x-user-email': user?.emailAddresses[0]?.emailAddress,
         }
       });
       const urls = response.data;

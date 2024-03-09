@@ -1,10 +1,10 @@
 import express from "express";
 import { authMiddleware } from "../middlewares/auth";
-import { postConversation } from "../controllers/conversation";
-import { postCode } from "../controllers/code";
-import { generateImage } from "../controllers/image";
-import { generateMusic } from "../controllers/music";
-import { generateVideo } from "../controllers/video";
+import { postConversation } from "../controllers/ai/conversation";
+import { postCode } from "../controllers/ai/code";
+import { generateImage } from "../controllers/ai/image";
+import { generateMusic } from "../controllers/ai/music";
+import { generateVideo } from "../controllers/ai/video";
 
 const router = express.Router();
 

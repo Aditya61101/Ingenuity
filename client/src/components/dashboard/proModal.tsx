@@ -19,24 +19,32 @@ import { tools } from "@/constants";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { RootState } from "@/store";
+import { useUser } from "@clerk/clerk-react";
 
 export const ProModal = () => {
+    const { user } = useUser();
     const [loading, setLoading] = useState<boolean>(false);
     const { isOpen } = useSelector((state: RootState) => state.modal);
-    
+
     const dispatch = useDispatch();
 
     const onSubscribe = async () => {
         console.log('onSubscribe');
-        // try {
-        //   setLoading(true);
-        //   const response = await axios.get("/api/stripe");
-        //   window.location.href = response.data.url;
-        // } catch (error) {
-        //   toast.error("Something went wrong");
-        // } finally {
-        //   setLoading(false);
-        // }
+        try {
+            setLoading(true);
+            const response = await axios.get("http://localhost:8000/stripe", {
+                headers: {
+                    'x-user-id': user?.id,
+                    'x-user-email': user?.emailAddresses[0]?.emailAddress,
+                }
+            });
+            console.log(response.data);
+            window.location.href = response.data.url;
+        } catch (error) {
+            toast.error("Something went wrong");
+        } finally {
+            setLoading(false);
+        }
     }
     return (
         <Dialog open={isOpen} onOpenChange={() => dispatch(closeModal())}>

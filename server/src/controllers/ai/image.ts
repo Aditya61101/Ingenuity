@@ -1,8 +1,8 @@
 import { Response } from "express";
-import { CustomRequest } from "../middlewares/auth";
+import { CustomRequest } from "../../middlewares/auth";
 import OpenAI from "openai";
-import { checkApiLimit, incrementApiLimit } from "../libs/apiLimit";
-import { checkSubscription } from "../libs/subscription";
+import { checkApiLimit, incrementApiLimit } from "../../libs/apiLimit";
+import { checkSubscription } from "../../libs/subscription";
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
@@ -10,10 +10,6 @@ const openai = new OpenAI({
 
 export const generateImage = async (req: CustomRequest, res: Response) => {
     try {
-        if (!req.userId) {
-            console.log("[Image POST ERROR]", "Unauthorized");
-            return res.status(401).json({ error: "Unauthorized" });
-        }
         if (!openai.apiKey) {
             console.log("[Image POST ERROR]", "OpenAI api key not configured!");
             return res.status(500).json({ error: "OpenAI api key not configured!" });
@@ -29,8 +25,8 @@ export const generateImage = async (req: CustomRequest, res: Response) => {
             return res.status(400).json({ error: "Invalid amount!" });
         }
 
-        const isValidTrail = await checkApiLimit(req.userId);
-        const isPro = await checkSubscription(req.userId);
+        const isValidTrail = await checkApiLimit(req?.userId!);
+        const isPro = await checkSubscription(req?.userId!);
         if (!isValidTrail && !isPro) {
             return res.status(403).json({ error: "Free trail has expired. Please upgrade to pro!" });
         }
@@ -43,7 +39,7 @@ export const generateImage = async (req: CustomRequest, res: Response) => {
         });
         console.log("OpenAI API Response:", response);
 
-        if (!isPro) await incrementApiLimit(req.userId);
+        if (!isPro) await incrementApiLimit(req?.userId!);
 
         let urls = response.data?.map((item) => item.url);
         if (!urls || urls.length === 0) {

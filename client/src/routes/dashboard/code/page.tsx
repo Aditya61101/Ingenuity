@@ -14,7 +14,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@clerk/clerk-react";
+import { useUser } from "@clerk/clerk-react";
 import axios from "axios";
 import { ChatCompletionUserMessageParam } from 'openai/resources/chat/index.mjs';
 import ReactMarkdown from "react-markdown";
@@ -24,7 +24,7 @@ import { openModal } from "@/store/reducers/modalReducer";
 
 const CodePage = () => {
   const dispatch = useDispatch();
-  const { userId } = useAuth();
+  const { user } = useUser();
   const [messages, setMessages] = useState<ChatCompletionUserMessageParam[]>([]);
 
   const formSchema = z.object({
@@ -48,7 +48,8 @@ const CodePage = () => {
 
       const response = await axios.post('http://localhost:8000/api/code', { messages: newMessages }, {
         headers: {
-          'x-user-id': userId
+          'x-user-id': user?.id,
+          'x-user-email': user?.emailAddresses[0]?.emailAddress,
         }
       });
       console.log('response', response);

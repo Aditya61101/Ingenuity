@@ -11,14 +11,14 @@ import Empty from "@/components/dashboard/empty";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useAuth } from "@clerk/clerk-react";
+import { useUser } from "@clerk/clerk-react";
 import { openModal } from "@/store/reducers/modalReducer";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 
 const VideoPage = () => {
   const dispatch = useDispatch();
-  const { userId } = useAuth();
+  const { user } = useUser();
   const [video, setVideo] = useState<string>();
 
   const formSchema = z.object({
@@ -37,10 +37,10 @@ const VideoPage = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setVideo(undefined);
-
       const response = await axios.post('http://localhost:8000/api/video', values, {
         headers: {
-          'x-user-id': userId
+          'x-user-id': user?.id,
+          'x-user-email': user?.emailAddresses[0]?.emailAddress,
         }
       });
       console.log(response);

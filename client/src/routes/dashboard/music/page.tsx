@@ -11,14 +11,14 @@ import Empty from "@/components/dashboard/empty";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useAuth } from "@clerk/clerk-react";
+import { useUser } from "@clerk/clerk-react";
 import { openModal } from "@/store/reducers/modalReducer";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 
 const MusicPage = () => {
   const dispatch = useDispatch();
-  const { userId } = useAuth();
+  const { user } = useUser();
   const [music, setMusic] = useState<string>();
 
   const formSchema = z.object({
@@ -40,7 +40,8 @@ const MusicPage = () => {
 
       const response = await axios.post('http://localhost:8000/api/music', values, {
         headers: {
-          'x-user-id': userId
+          'x-user-id': user?.id,
+          'x-user-email': user?.emailAddresses[0]?.emailAddress,
         }
       });
       console.log(response);

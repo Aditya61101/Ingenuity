@@ -1,12 +1,10 @@
 import { Settings } from "lucide-react";
-
 import { Heading } from "@/components/dashboard/heading";
-// import { SubscriptionButton } from "@/components/subscription-button";
+import { SubscriptionButton } from "@/components/dashboard/subscribeButton";
 // import { checkSubscription } from "@/lib/subscription";
 
 const SettingsPage = () => {
-  // const isPro = await checkSubscription();
-
+  const isPro = false;
   return (
     <div>
       <Heading
@@ -16,12 +14,12 @@ const SettingsPage = () => {
         iconColor="text-gray-700"
         bgColor="bg-gray-700/10"
       />
+      <hr className="mt-[-15px]"/>
       <div className="px-4 lg:px-8 space-y-4">
-        <div className="text-muted-foreground text-sm">
-        You are currently on a free plan.
-          {/* {isPro ? "You are currently on a Pro plan." : "You are currently on a free plan."} */}
+        <div className="text-muted-foreground text-sm mt-4">
+          {isPro ? "You are currently on a Pro plan." : "You are currently on a free plan."}
         </div>
-        {/* <SubscriptionButton isPro={isPro} /> */}
+        <SubscriptionButton isPro={isPro} />
       </div>
     </div>
   );

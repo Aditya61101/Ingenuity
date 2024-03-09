@@ -1,8 +1,8 @@
 import OpenAI from "openai";
 import { Response } from "express";
-import { CustomRequest } from "../middlewares/auth";
-import { checkApiLimit, incrementApiLimit } from "../libs/apiLimit";
-import { checkSubscription } from "../libs/subscription";
+import { CustomRequest } from "../../middlewares/auth";
+import { checkApiLimit, incrementApiLimit } from "../../libs/apiLimit";
+import { checkSubscription } from "../../libs/subscription";
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
@@ -10,10 +10,6 @@ const openai = new OpenAI({
 
 export const postConversation = async (req: CustomRequest, res: Response) => {
     try {
-        if (!req.userId) {
-            console.log("[CONVERSATION POST ERROR]", "Unauthorized");
-            return res.status(401).json({ error: "Unauthorized" });
-        }
         const { messages } = req.body;
         if (!openai.apiKey) {
             console.log("[CONVERSATION POST ERROR]", "OpenAI api key not configured!");
@@ -24,8 +20,8 @@ export const postConversation = async (req: CustomRequest, res: Response) => {
             return res.status(400).json({ error: "Messages not provided!" });
         }
 
-        const isValidTrail = await checkApiLimit(req.userId);
-        const isPro = await checkSubscription(req.userId);
+        const isValidTrail = await checkApiLimit(req?.userId!);
+        const isPro = await checkSubscription(req?.userId!);
         if (!isValidTrail && !isPro) {
             return res.status(403).json({ error: "Free trail has expired. Please upgrade to pro!" });
         }
@@ -35,7 +31,7 @@ export const postConversation = async (req: CustomRequest, res: Response) => {
             messages,
         });
 
-        if(!isPro) await incrementApiLimit(req.userId);
+        if(!isPro) await incrementApiLimit(req?.userId!);
 
         return res.status(201).json(chatCompletion.choices[0].message);
 

@@ -1,8 +1,8 @@
 import { Response } from "express";
 import OpenAI from "openai";
-import { CustomRequest } from "../middlewares/auth";
-import { checkApiLimit, incrementApiLimit } from "../libs/apiLimit";
-import { checkSubscription } from "../libs/subscription";
+import { CustomRequest } from "../../middlewares/auth";
+import { checkApiLimit, incrementApiLimit } from "../../libs/apiLimit";
+import { checkSubscription } from "../../libs/subscription";
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
@@ -15,11 +15,6 @@ const instructionMessage = {
 
 export const postCode = async (req: CustomRequest, res: Response) => {
     try {
-        //have to do authentication here as the react app is using clerk authentication
-        if (!req.userId) {
-            console.log("[Code POST ERROR]", "Unauthorized");
-            return res.status(401).json({ error: "Unauthorized" });
-        }
         const { messages } = req.body;
         if (!openai.apiKey) {
             console.log("[Code POST ERROR]", "OpenAI api key not configured!");
@@ -29,8 +24,8 @@ export const postCode = async (req: CustomRequest, res: Response) => {
             console.log("[Code POST ERROR]", "Messages not provided!");
             return res.status(400).json({ error: "Messages not provided!" });
         }
-        const isValidTrail = await checkApiLimit(req.userId);
-        const isPro = await checkSubscription(req.userId);
+        const isValidTrail = await checkApiLimit(req?.userId!);
+        const isPro = await checkSubscription(req?.userId!);
         if (!isValidTrail && !isPro) {
             return res.status(403).json({ error: "Free trail has expired. Please upgrade to pro!" });
         }
@@ -40,7 +35,7 @@ export const postCode = async (req: CustomRequest, res: Response) => {
             messages: [instructionMessage, ...messages]
         });
         
-        if (!isPro) await incrementApiLimit(req.userId);
+        if (!isPro) await incrementApiLimit(req?.userId!);
         
         console.log(typeof codeCompletion.choices[0].message.content);
         return res.status(201).json(codeCompletion.choices[0].message);

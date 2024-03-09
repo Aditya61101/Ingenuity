@@ -13,7 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@clerk/clerk-react";
+import { useUser } from "@clerk/clerk-react";
 import axios from "axios";
 import { ChatCompletionUserMessageParam } from 'openai/resources/chat/index.mjs';
 import { openModal } from "@/store/reducers/modalReducer";
@@ -22,7 +22,7 @@ import { useDispatch } from "react-redux";
 
 const Conversation = () => {
   const dispatch = useDispatch();
-  const { userId } = useAuth();
+  const { user } = useUser();
 
   const [messages, setMessages] = useState<ChatCompletionUserMessageParam[]>([]);
 
@@ -47,7 +47,8 @@ const Conversation = () => {
 
       const response = await axios.post('http://localhost:8000/api/conversation', { messages: newMessages }, {
         headers: {
-          'x-user-id': userId
+          'x-user-id': user?.id,
+          'x-user-email': user?.emailAddresses[0]?.emailAddress,
         }
       });
       console.log('response', response);
