@@ -7,8 +7,8 @@ const Navbar = () => {
         <div className="flex items-center p-4">
             <MobileSidebar />
             <div className="flex gap-x-2 items-center w-full justify-end">
-                <ModeToggle />
                 <UserButton afterSignOutUrl="/" />
+                <ModeToggle />
             </div>
         </div>
     );

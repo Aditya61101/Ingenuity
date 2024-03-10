@@ -4,20 +4,21 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { Sidebar } from "@/components/dashboard/sidebar";
 import Navbar from "@/components/dashboard/navbar";
 import { ProModal } from "@/components/dashboard/proModal";
+import { Loader } from "@/components/loader";
 
 const DashboardLayout = () => {
     const { userId, isLoaded } = useAuth();
     const navigate = useNavigate();
-    console.log('for testing', userId);
     useEffect(() => {
-        if (!userId) {
+        console.log({ isLoaded, userId });
+        if (isLoaded && !userId) {
             navigate("/sign-in");
         }
-    }, [userId, navigate])
-    if (!isLoaded) return "Loading..."
+    }, [userId, navigate, isLoaded])
+    if (!isLoaded) return <Loader/>
     return (
         <div className="h-full relative">
-            <ProModal/>
+            <ProModal />
             <div className="hidden h-full md:flex md:w-72 md:flex-col md:fixed md:inset-y-0 z-80 bg-gray-900">
                 <Sidebar />
             </div>

@@ -1,4 +1,4 @@
-1. check stripe integration
-2. frontend routes need to be fixed
+1. check stripe integration - done
+2. frontend routes need to be fixed - done
 3. api for checking subscription and api-limit have to be made
 4. completion is still not done (crisp integration left)

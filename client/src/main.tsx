@@ -1,28 +1,21 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import './index.css'
+import React, { Suspense } from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
 import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
 import { ThemeProvider } from './components/theme-provider.tsx';
 //routes
-import LandingPage from './routes/landing/page.tsx';
-import Dashboard from './routes/dashboard/main/page.tsx';
-import SignInPage from './routes/auth/sign-in/page.tsx';
-import SignUpPage from './routes/auth/sign-up/page.tsx';
-import Code from './routes/dashboard/code/page.tsx';
-import Conversation from './routes/dashboard/conversation/page.tsx';
-import Image from './routes/dashboard/image/page.tsx';
-import Music from './routes/dashboard/music/page.tsx';
-import Video from './routes/dashboard/video/page.tsx';
-import Settings from './routes/dashboard/settings/page.tsx';
+import { LandingPage, SignInPage, SignUpPage, Code, Conversation, Dashboard, Image, Music, Settings, Video } from './routes/index.ts';
 //layouts
 import RootLayout from './layouts/root-layout.tsx';
 import DashboardLayout from './layouts/dashboard-layout.tsx';
 //react-redux
 import { Provider } from 'react-redux'
 import { store } from './store/index.ts';
+//loader for Suspense
+import { Loader } from './components/loader.tsx';
 
 const router = createBrowserRouter([
   {
@@ -50,10 +43,12 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-      <Provider store={store}>
-        <RouterProvider router={router} />
-      </Provider>
-    </ThemeProvider>
+    <Suspense fallback={<Loader />}>
+      <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+        <Provider store={store}>
+          <RouterProvider router={router} />
+        </Provider>
+      </ThemeProvider>
+    </Suspense>
   </React.StrictMode>
-)
+);

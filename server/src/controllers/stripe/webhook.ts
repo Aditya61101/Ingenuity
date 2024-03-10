@@ -6,7 +6,6 @@ import db from "../../config/db";
 
 //INDIAN CARD: 4000003560000008
 export const postPaymentWebhook = async (req: CustomRequest, res: Response) => {
-    // console.log("[STRIPE WEBHOOK]", req.body.toString('utf-8'));
     const signature = req.headers['stripe-signature']!;
     let event: Stripe.Event;
     try {
