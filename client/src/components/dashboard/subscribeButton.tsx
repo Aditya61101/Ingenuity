@@ -1,5 +1,3 @@
-"use client";
-
 import axios from "axios";
 import { useState } from "react";
 import { Zap } from "lucide-react";

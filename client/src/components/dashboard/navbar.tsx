@@ -2,7 +2,7 @@ import { UserButton } from "@clerk/clerk-react";
 import { MobileSidebar } from "@/components/dashboard/mobileSidebar";
 import { ModeToggle } from "../mode-toggle";
 
-const Navbar = () => {
+export const Navbar = () => {
     return (
         <div className="flex items-center p-4">
             <MobileSidebar />
@@ -13,5 +13,3 @@ const Navbar = () => {
         </div>
     );
 }
-
-export default Navbar;

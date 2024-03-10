@@ -1,11 +1,11 @@
 import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
+import { Toaster } from 'react-hot-toast';
 import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-import { ThemeProvider } from './components/theme-provider.tsx';
 //routes
 import { LandingPage, SignInPage, SignUpPage, Code, Conversation, Dashboard, Image, Music, Settings, Video } from './routes/index.ts';
 //layouts
@@ -14,8 +14,10 @@ import DashboardLayout from './layouts/dashboard-layout.tsx';
 //react-redux
 import { Provider } from 'react-redux'
 import { store } from './store/index.ts';
-//loader for Suspense
+//components
+import { ThemeProvider } from './components/theme-provider.tsx';
 import { Loader } from './components/loader.tsx';
+import { CrispChat } from './components/crisp-provider.tsx';
 
 const router = createBrowserRouter([
   {
@@ -46,6 +48,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <Suspense fallback={<Loader />}>
       <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
         <Provider store={store}>
+          <CrispChat />
+          <Toaster />
           <RouterProvider router={router} />
         </Provider>
       </ThemeProvider>

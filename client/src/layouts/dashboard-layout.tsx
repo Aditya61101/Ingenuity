@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useAuth } from "@clerk/clerk-react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { Sidebar } from "@/components/dashboard/sidebar";
-import Navbar from "@/components/dashboard/navbar";
+import { Navbar } from "@/components/dashboard/navbar";
 import { ProModal } from "@/components/dashboard/proModal";
 import { Loader } from "@/components/loader";
 
@@ -14,8 +14,8 @@ const DashboardLayout = () => {
         if (isLoaded && !userId) {
             navigate("/sign-in");
         }
-    }, [userId, navigate, isLoaded])
-    if (!isLoaded) return <Loader/>
+    }, [userId, navigate, isLoaded]);
+    if (!isLoaded) return <Loader />;
     return (
         <div className="h-full relative">
             <ProModal />
