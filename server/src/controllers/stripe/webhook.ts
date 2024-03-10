@@ -23,7 +23,7 @@ export const postPaymentWebhook = async (req: CustomRequest, res: Response) => {
         case "checkout.session.completed": {
             const session = event.data.object as Stripe.Checkout.Session;
             const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
-            console.log("[STRIPE WEBHOOK LINE33]", session); // metadata shouldn't be empty
+            console.log("[STRIPE WEBHOOK LINE33]", session);
             console.log("[STRIPE WEBHOOK LINE34]", subscription);
             if (!session?.metadata?.userId)
                 return res.status(400).json({ error: "User id is required" });
@@ -46,7 +46,7 @@ export const postPaymentWebhook = async (req: CustomRequest, res: Response) => {
         case "invoice.payment_succeeded": {
             const session = event.data.object as Stripe.Invoice;
             const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
-            console.log("[STRIPE WEBHOOK LINE49]", session); // metadata should be empty
+            console.log("[STRIPE WEBHOOK LINE49]", session);
             console.log("[STRIPE WEBHOOK LINE50]", subscription);
             const subscriber = await db.userSubscription.findFirst({
                 where: {
