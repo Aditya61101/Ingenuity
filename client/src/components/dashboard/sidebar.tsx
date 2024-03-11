@@ -5,7 +5,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useUser } from "@clerk/clerk-react";
 import axios from "axios";
 import toast from "react-hot-toast";
-// import { Loader } from "../loader";
 
 const routes = [
     {
