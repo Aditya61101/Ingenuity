@@ -1,6 +1,6 @@
+import OpenAI from "openai";
 import { Response } from "express";
 import { CustomRequest } from "../../middlewares/auth";
-import OpenAI from "openai";
 import { checkApiLimit, incrementApiLimit } from "../../libs/apiLimit";
 import { checkSubscription } from "../../libs/subscription";
 

@@ -1,7 +1,7 @@
 import { Response } from "express";
+import { CustomRequest } from '../../middlewares/auth';
 import { getApiLimitCount } from '../../libs/apiLimit';
 import { checkSubscription } from '../../libs/subscription';
-import { CustomRequest } from '../../middlewares/auth';
 export const getUserStatus = async (req: CustomRequest, res: Response) => {
     try {
         const isPro = await checkSubscription(req?.userId!);
