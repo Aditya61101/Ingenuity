@@ -2,10 +2,7 @@ import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import { Toaster } from 'react-hot-toast';
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 //routes
 import { LandingPage, SignInPage, SignUpPage, Code, Conversation, Dashboard, Image, Music, Settings, Video } from './routes/index.ts';
 //layouts
@@ -18,7 +15,10 @@ import { store } from './store/index.ts';
 import { ThemeProvider } from './components/theme-provider.tsx';
 import { Loader } from './components/loader.tsx';
 import { CrispChat } from './components/crisp-provider.tsx';
+//react-query
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
+const queryClient = new QueryClient();
 const router = createBrowserRouter([
   {
     element: <RootLayout />,
@@ -46,13 +46,15 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <Suspense fallback={<Loader />}>
-      <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-        <Provider store={store}>
-          <CrispChat />
-          <Toaster />
-          <RouterProvider router={router} />
-        </Provider>
-      </ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+          <Provider store={store}>
+            <CrispChat />
+            <Toaster />
+            <RouterProvider router={router} />
+          </Provider>
+        </ThemeProvider>
+      </QueryClientProvider>
     </Suspense>
   </React.StrictMode>
 );

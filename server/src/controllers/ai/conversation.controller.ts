@@ -8,7 +8,7 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
 
-export const postConversation = async (req: CustomRequest, res: Response) => {
+export const generateConversation = async (req: CustomRequest, res: Response) => {
     try {
         const { messages } = req.body;
         if (!openai.apiKey) {

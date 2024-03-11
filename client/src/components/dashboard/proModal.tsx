@@ -29,7 +29,6 @@ export const ProModal = () => {
     const dispatch = useDispatch();
 
     const onSubscribe = async () => {
-        console.log('onSubscribe');
         try {
             setLoading(true);
             const response = await axios.get("http://localhost:8000/stripe", {

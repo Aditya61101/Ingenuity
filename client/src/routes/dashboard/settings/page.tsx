@@ -1,10 +1,30 @@
 import { Settings } from "lucide-react";
 import { Heading } from "@/components/dashboard/heading";
 import { SubscriptionButton } from "@/components/dashboard/subscribeButton";
-// import { checkSubscription } from "@/lib/subscription";
+import axios from "axios";
+import { useUser } from "@clerk/clerk-react";
+import toast from "react-hot-toast";
+import { useQuery } from "@tanstack/react-query";
 
 const SettingsPage = () => {
-  const isPro = false;
+  const {user} = useUser();
+  const getUserStatus = async () => {
+    try {
+        const { data } = await axios.get("http://localhost:8000/api/user-status", {
+            headers: {
+                'x-user-id': user?.id,
+                'x-user-email': user?.emailAddresses[0].emailAddress
+            }
+        })
+        return data;
+    } catch (error) {
+        console.log(error);
+        toast.error("Something went wrong");
+    }
+  }
+  const response = useQuery({ queryKey: ['user-status'], queryFn: getUserStatus });
+  console.log(response.data);
+  const isPro = response?.data?.isPro;
   return (
     <div>
       <Heading

@@ -3,9 +3,9 @@ import dotenv from "dotenv";
 dotenv.config();
 import cors from "cors";
 //routes
-import aiRoutes from "./routes/aiGeneration";
-import paymentRoute from "./routes/stripe";
-import webHookRoute from "./routes/webhook";
+import aiRoutes from "./routes/features.route";
+import paymentRoute from "./routes/stripe.route";
+import webHookRoute from "./routes/webhook.route";
 
 const app:Express = express();
 const PORT=process.env.PORT||8000;

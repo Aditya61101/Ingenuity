@@ -1,5 +1,5 @@
 import express from 'express';
-import { postPaymentWebhook } from "../controllers/stripe/webhook";
+import { postPaymentWebhook } from "../controllers/stripe/webhook.controller";
 
 const router = express.Router();
 

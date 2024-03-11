@@ -21,8 +21,10 @@ import ReactMarkdown from "react-markdown";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { openModal } from "@/store/reducers/modalReducer";
+import { useQueryClient } from "@tanstack/react-query";
 
 const CodePage = () => {
+  const queryClient = useQueryClient();
   const dispatch = useDispatch();
   const { user } = useUser();
   const [messages, setMessages] = useState<ChatCompletionUserMessageParam[]>([]);
@@ -54,7 +56,7 @@ const CodePage = () => {
       });
       console.log('response', response);
       setMessages((current) => [...current, userMessage, response.data]);
-
+      queryClient.invalidateQueries({ queryKey: ['user-status'] });
       form.reset();
     } catch (error: any) {
       console.error('error', error);

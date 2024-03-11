@@ -13,7 +13,7 @@ const instructionMessage = {
     content: "You are a code generator. You must answer only in markdown code snippets. Use code comments for explanations."
 };
 
-export const postCode = async (req: CustomRequest, res: Response) => {
+export const generateCode = async (req: CustomRequest, res: Response) => {
     try {
         const { messages } = req.body;
         if (!openai.apiKey) {

@@ -18,8 +18,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { openModal } from "@/store/reducers/modalReducer";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Conversation = () => {
+  const queryClient = useQueryClient();
   const dispatch = useDispatch();
   const { user } = useUser();
   const [photos, setPhotos] = useState<string[]>([]);
@@ -46,6 +48,7 @@ const Conversation = () => {
       });
       const urls = response.data;
       setPhotos(urls);
+      queryClient.invalidateQueries({ queryKey: ['user-status'] })
       form.reset();
     } catch (error: any) {
       console.error('error', error);

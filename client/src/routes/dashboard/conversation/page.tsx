@@ -19,8 +19,10 @@ import { ChatCompletionUserMessageParam } from 'openai/resources/chat/index.mjs'
 import { openModal } from "@/store/reducers/modalReducer";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Conversation = () => {
+  const queryClient = useQueryClient();
   const dispatch = useDispatch();
   const { user } = useUser();
 
@@ -53,7 +55,7 @@ const Conversation = () => {
       });
       console.log('response', response);
       setMessages((current) => [...current, userMessage, response.data]);
-
+      queryClient.invalidateQueries({ queryKey: ['user-status'] })
       form.reset();
     } catch (error: any) {
       console.error('error', error);
@@ -136,7 +138,7 @@ const Conversation = () => {
                   ? message.content.map((part, idx) => {
                     if ("text" in part) {
                       return <span key={idx}>{part.text}</span>
-                    } else{
+                    } else {
                       return null;
                     }
                   })

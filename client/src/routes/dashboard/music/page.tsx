@@ -15,8 +15,10 @@ import { useUser } from "@clerk/clerk-react";
 import { openModal } from "@/store/reducers/modalReducer";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
+import { useQueryClient } from "@tanstack/react-query";
 
 const MusicPage = () => {
+  const queryClient = useQueryClient();
   const dispatch = useDispatch();
   const { user } = useUser();
   const [music, setMusic] = useState<string>();
@@ -46,6 +48,7 @@ const MusicPage = () => {
       });
       console.log(response);
       setMusic(response.data);
+      queryClient.invalidateQueries({ queryKey: ['user-status'] })
       form.reset();
     } catch (error: any) {
       console.error('error', error);

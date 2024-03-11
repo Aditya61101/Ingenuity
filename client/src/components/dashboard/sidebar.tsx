@@ -1,7 +1,11 @@
 import { Link, useLocation } from "react-router-dom";
 import { Code, ImageIcon, LayoutDashboard, MessageSquare, Music, Settings, VideoIcon } from "lucide-react";
 import { FreeCounter } from "./freeCounter";
-// import { FreeCounter } from "@/components/free-counter";
+import { useQuery } from "@tanstack/react-query";
+import { useUser } from "@clerk/clerk-react";
+import axios from "axios";
+import toast from "react-hot-toast";
+// import { Loader } from "../loader";
 
 const routes = [
     {
@@ -49,11 +53,30 @@ const routes = [
 
 export const Sidebar = () => {
     const location = useLocation();
+    const { user } = useUser();
     const pathname = location.pathname;
-    const apiLimitCount = 0; // TODO: get from server
-    const isPro = false; // TODO: get from server
+    const getUserStatus = async () => {
+        try {
+            const { data } = await axios.get("http://localhost:8000/api/user-status", {
+                headers: {
+                    'x-user-id': user?.id,
+                    'x-user-email': user?.emailAddresses[0].emailAddress
+                }
+            })
+            return data;
+        } catch (error) {
+            console.log(error);
+            toast.error("Something went wrong");
+        }
+    }
+    const response = useQuery({ queryKey: ['user-status'], queryFn: getUserStatus });
+    console.log(response.data);
+    // if(response.isLoading) return <Loader/>;
+    const apiLimitCount = response?.data?.apiLimitCount;
+    const isPro = response?.data?.isPro;
+
     return (
-        <div className="space-y-4 py-4 flex flex-col h-full bg-[#111827] text-white">
+        <div className="space-y-4 py-4 flex flex-col h-full bg-[#0e131f] text-white">
             <div className="px-3 py-2 flex-1">
                 <Link to="/" className="flex items-center pl-3 mb-14">
                     <div className="relative h-8 w-8 mr-4">
