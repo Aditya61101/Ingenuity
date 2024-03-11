@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "prisma generate && esbuild src/index.ts --bundle --platform=node --outfile=build/index.js",
     "dev": "nodemon --exec ts-node src/index.ts",
-    "start": "npm run build && node build/index.js"
+    "start": "npm run build && node build/index.js",
+    "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "",
@@ -18,7 +19,6 @@
     "dotenv": "^16.4.5",
     "express": "^4.18.3",
     "openai": "^4.28.4",
-    "prisma": "^5.10.2",
     "replicate": "^0.27.1",
     "stripe": "^14.19.0"
   },
@@ -28,6 +28,7 @@
     "@types/node": "^20.11.24",
     "esbuild": "^0.20.1",
     "nodemon": "^3.1.0",
+    "prisma": "^5.10.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   }
