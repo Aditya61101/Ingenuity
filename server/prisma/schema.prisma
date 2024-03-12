@@ -6,61 +6,62 @@
 
 generator client {
   provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "linux-musl","linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
 model Code {
-  id          String    @id @default(cuid())
-  userId      String    @unique
-  prompt      String
-  code        String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  prompt    String
+  code      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Conversation {
-  id          String    @id @default(cuid())
-  userId      String    @unique
-  prompt      String
-  conversation        String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  prompt       String
+  conversation String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Image {
-  id          String    @id @default(cuid())
-  userId      String    @unique
-  prompt      String
-  imageUrls   String[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  prompt    String
+  imageUrls String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Music {
-  id          String    @id @default(cuid())
-  userId      String    @unique
-  prompt      String
-  musicUrl    String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  prompt    String
+  musicUrl  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Video {
-  id          String    @id @default(cuid())
-  userId      String    @unique
-  prompt      String
-  videoUrl    String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  prompt    String
+  videoUrl  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model UserApiLimit {
-  id        String      @id @default(cuid())
+  id        String   @id @default(cuid())
   userId    String   @unique
   count     Int      @default(0)
   createdAt DateTime @default(now())
@@ -68,10 +69,10 @@ model UserApiLimit {
 }
 
 model UserSubscription {
-  id        String      @id @default(cuid())
-  userId    String   @unique
-  name      String?
-  phone     String?
+  id                     String    @id @default(cuid())
+  userId                 String    @unique
+  name                   String?
+  phone                  String?
   stripeCustomerId       String?   @unique @map(name: "stripe_customer_id")
   stripeSubscriptionId   String?   @unique @map(name: "stripe_subscription_id")
   stripePriceId          String?   @map(name: "stripe_price_id")
