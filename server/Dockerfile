@@ -5,6 +5,7 @@ WORKDIR /user/src/app
 COPY package*.json .
 
 RUN npm install
+
 COPY . .
 
 RUN npm run build
@@ -16,7 +17,10 @@ ENV NODE_ENV=${NODE_ENV}
 
 WORKDIR /user/src/app
 
+RUN apk add openssl3
+
 COPY package*.json .
+COPY prisma ./prisma/
 
 RUN npm ci --only=production
 
