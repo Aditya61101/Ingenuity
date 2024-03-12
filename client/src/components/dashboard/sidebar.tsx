@@ -56,7 +56,7 @@ export const Sidebar = () => {
     const pathname = location.pathname;
     const getUserStatus = async () => {
         try {
-            const { data } = await axios.get("http://localhost:8000/api/user-status", {
+            const { data } = await axios.get("https://ingenuity-cj1p.onrender.com/api/user-status", {
                 headers: {
                     'x-user-id': user?.id,
                     'x-user-email': user?.emailAddresses[0].emailAddress

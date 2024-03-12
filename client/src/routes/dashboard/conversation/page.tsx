@@ -47,7 +47,7 @@ const Conversation = () => {
       const userMessage: ChatCompletionUserMessageParam = { role: "user", content: values.prompt };
       const newMessages = [...messages, userMessage];
 
-      const response = await axios.post('http://localhost:8000/api/conversation', { messages: newMessages }, {
+      const response = await axios.post('https://ingenuity-cj1p.onrender.com/api/conversation', { messages: newMessages }, {
         headers: {
           'x-user-id': user?.id,
           'x-user-email': user?.emailAddresses[0]?.emailAddress,
