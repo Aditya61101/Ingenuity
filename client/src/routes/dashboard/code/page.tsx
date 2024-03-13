@@ -15,13 +15,13 @@ import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import { useUser } from "@clerk/clerk-react";
-import axios from "axios";
 import { ChatCompletionUserMessageParam } from 'openai/resources/chat/index.mjs';
 import ReactMarkdown from "react-markdown";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { openModal } from "@/store/reducers/modalReducer";
 import { useQueryClient } from "@tanstack/react-query";
+import { apiCall } from "@/lib/axios";
 
 const CodePage = () => {
   const queryClient = useQueryClient();
@@ -42,20 +42,16 @@ const CodePage = () => {
   });
 
   const isLoading = form.formState.isSubmitting;
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log('values', values);
     try {
       const userMessage: ChatCompletionUserMessageParam = { role: "user", content: values.prompt };
       const newMessages = [...messages, userMessage];
 
-      const response = await axios.post('http://localhost:8000/api/code', { messages: newMessages }, {
-        headers: {
-          'x-user-id': user?.id,
-          'x-user-email': user?.emailAddresses[0]?.emailAddress,
-        }
-      });
-      console.log('response', response);
+      const api = apiCall(user);
+      const response = await api.post("code", { messages: newMessages });
       setMessages((current) => [...current, userMessage, response.data]);
+      
       queryClient.invalidateQueries({ queryKey: ['user-status'] });
       form.reset();
     } catch (error: any) {

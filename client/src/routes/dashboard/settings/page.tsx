@@ -1,25 +1,21 @@
 import { Settings } from "lucide-react";
 import { Heading } from "@/components/dashboard/heading";
 import { SubscriptionButton } from "@/components/dashboard/subscribeButton";
-import axios from "axios";
 import { useUser } from "@clerk/clerk-react";
 import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
+import { apiCall } from "@/lib/axios";
 
 const SettingsPage = () => {
   const { user } = useUser();
   const getUserStatus = async () => {
     try {
-        const { data } = await axios.get("https://ingenuity-cj1p.onrender.com/api/user-status", {
-            headers: {
-                'x-user-id': user?.id,
-                'x-user-email': user?.emailAddresses[0].emailAddress
-            }
-        })
-        return data;
+      const api = apiCall(user);
+      const { data } = await api.get("user-status");
+      return data;
     } catch (error) {
-        console.log(error);
-        toast.error("Something went wrong");
+      console.log(error);
+      toast.error("Something went wrong");
     }
   }
   const response = useQuery({ queryKey: ['user-status'], queryFn: getUserStatus });

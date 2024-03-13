@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { useUser } from "@clerk/clerk-react";
-import axios from "axios";
 import { amountOptions, formSchema, resolutionOptions } from "./constants";
 import { Heading } from "@/components/dashboard/heading";
 import { Loader } from "@/components/dashboard/loader";
@@ -19,6 +18,7 @@ import { openModal } from "@/store/reducers/modalReducer";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { useQueryClient } from "@tanstack/react-query";
+import { apiCall } from "@/lib/axios";
 
 const Conversation = () => {
   const queryClient = useQueryClient();
@@ -36,18 +36,15 @@ const Conversation = () => {
   });
 
   const isLoading = form.formState.isSubmitting;
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log('values', values);
     try {
       setPhotos([]);
-      const response = await axios.post('http://localhost:8000/api/image', values, {
-        headers: {
-          'x-user-id': user?.id,
-          'x-user-email': user?.emailAddresses[0]?.emailAddress,
-        }
-      });
-      const urls = response.data;
-      setPhotos(urls);
+
+      const api = apiCall(user);
+      const response = await api.post("image", values);
+      setPhotos(response.data);
+
       queryClient.invalidateQueries({ queryKey: ['user-status'] })
       form.reset();
     } catch (error: any) {

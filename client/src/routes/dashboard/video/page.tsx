@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import * as z from "zod";
-import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Video } from "lucide-react";
@@ -15,9 +14,12 @@ import { useUser } from "@clerk/clerk-react";
 import { openModal } from "@/store/reducers/modalReducer";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
+import { apiCall } from "@/lib/axios";
+import { useQueryClient } from "@tanstack/react-query";
 
 const VideoPage = () => {
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const { user } = useUser();
   const [video, setVideo] = useState<string>();
 
@@ -34,17 +36,16 @@ const VideoPage = () => {
   });
 
   const isLoading = form.formState.isSubmitting;
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setVideo(undefined);
-      const response = await axios.post('http://localhost:8000/api/video', values, {
-        headers: {
-          'x-user-id': user?.id,
-          'x-user-email': user?.emailAddresses[0]?.emailAddress,
-        }
-      });
-      console.log(response);
+
+      const api = apiCall(user);
+      const response = await api.post("video", values);
       setVideo(response.data[0]);
+
+      queryClient.invalidateQueries({ queryKey: ['user-status'] });
       form.reset();
     } catch (error: any) {
       console.error('error', error);

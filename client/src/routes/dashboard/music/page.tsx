@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import * as z from "zod";
-import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Music } from "lucide-react";
@@ -16,6 +15,7 @@ import { openModal } from "@/store/reducers/modalReducer";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { useQueryClient } from "@tanstack/react-query";
+import { apiCall } from "@/lib/axios";
 
 const MusicPage = () => {
   const queryClient = useQueryClient();
@@ -39,16 +39,12 @@ const MusicPage = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setMusic(undefined);
-
-      const response = await axios.post('http://localhost:8000/api/music', values, {
-        headers: {
-          'x-user-id': user?.id,
-          'x-user-email': user?.emailAddresses[0]?.emailAddress,
-        }
-      });
-      console.log(response);
+      
+      const api = apiCall(user);
+      const response = await api.post("music", values);
       setMusic(response.data);
-      queryClient.invalidateQueries({ queryKey: ['user-status'] })
+
+      queryClient.invalidateQueries({ queryKey: ['user-status'] });
       form.reset();
     } catch (error: any) {
       console.error('error', error);
