@@ -14,33 +14,87 @@ const instructionMessage = {
 };
 
 export const generateCode = async (req: CustomRequest, res: Response) => {
+
     try {
+
         const { messages } = req.body;
+
         if (!openai.apiKey) {
+
             console.log("[Code POST ERROR]", "OpenAI api key not configured!");
+
             return res.status(500).json({ error: "OpenAI api key not configured!" });
-        }
-        if (!messages) {
-            console.log("[Code POST ERROR]", "Messages not provided!");
-            return res.status(400).json({ error: "Messages not provided!" });
-        }
-        const isValidTrail = await checkApiLimit(req?.userId!);
-        const isPro = await checkSubscription(req?.userId!);
-        if (!isValidTrail && !isPro) {
-            return res.status(403).json({ error: "Free trail has expired. Please upgrade to pro!" });
+
         }
 
-        const codeCompletion = await openai.chat.completions.create({
+        if (!messages) {
+
+            console.log("[Code POST ERROR]", "Messages not provided!");
+
+            return res.status(400).json({ error: "Messages not provided!" });
+
+        }
+
+        const isValidTrail = await checkApiLimit(req?.userId!);
+
+        const isPro = await checkSubscription(req?.userId!);
+
+        if (!isValidTrail && !isPro) {
+
+            return res.status(403).json({ error: "Free trail has expired. Please upgrade to pro!" });
+
+        }
+
+
+
+        const codeCompletionStream = await openai.chat.completions.create({
+
             model: "gpt-3.5-turbo",
-            messages: [instructionMessage, ...messages]
+
+            messages: [instructionMessage, ...messages],
+
+            stream: true
+
         });
-        
+
+
+
         if (!isPro) await incrementApiLimit(req?.userId!);
-        
-        console.log(typeof codeCompletion.choices[0].message.content);
-        return res.status(201).json(codeCompletion.choices[0].message);
+
+
+
+        res.status(200);
+
+        codeCompletionStream.on('data', (chunk) => {
+
+            res.write(chunk);
+
+        });
+
+
+
+        codeCompletionStream.on('end', () => {
+
+            res.end();
+
+        });
+
+
+
+        codeCompletionStream.on('error', (error) => {
+
+            console.log("[Code POST ERROR]", error);
+
+            res.status(500).json({ error: "Something went wrong." });
+
+        });
+
     } catch (error) {
+
         console.log("[Code POST ERROR]", error);
+
         return res.status(500).json({ error: "Something went wrong." });
+
     }
+
 }

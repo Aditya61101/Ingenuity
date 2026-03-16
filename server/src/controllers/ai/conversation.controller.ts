@@ -9,34 +9,97 @@ const openai = new OpenAI({
 });
 
 export const generateConversation = async (req: CustomRequest, res: Response) => {
+
     try {
+
         const { messages } = req.body;
+
         if (!openai.apiKey) {
+
             console.log("[CONVERSATION POST ERROR]", "OpenAI api key not configured!");
+
             return res.status(500).json({ error: "OpenAI api key not configured!" });
+
         }
+
         if (!messages) {
+
             console.log("[CONVERSATION POST ERROR]", "Messages not provided!");
+
             return res.status(400).json({ error: "Messages not provided!" });
+
         }
+
+
 
         const isValidTrail = await checkApiLimit(req?.userId!);
+
         const isPro = await checkSubscription(req?.userId!);
+
         if (!isValidTrail && !isPro) {
+
             return res.status(403).json({ error: "Free trail has expired. Please upgrade to pro!" });
+
         }
-        
-        const chatCompletion = await openai.chat.completions.create({
+
+
+
+        const chatCompletionStream = await openai.chat.completions.create({
+
             model: "gpt-3.5-turbo",
+
             messages,
+
+            stream: true,
+
         });
 
-        if(!isPro) await incrementApiLimit(req?.userId!);
 
-        return res.status(201).json(chatCompletion.choices[0].message);
+
+        if (!isPro) await incrementApiLimit(req?.userId!);
+
+
+
+        res.setHeader('Content-Type', 'text/event-stream');
+
+        res.setHeader('Cache-Control', 'no-cache');
+
+        res.setHeader('Connection', 'keep-alive');
+
+
+
+        chatCompletionStream.on('data', (chunk) => {
+
+            res.write(`data: ${chunk}\n\n`);
+
+        });
+
+
+
+        chatCompletionStream.on('end', () => {
+
+            res.end();
+
+        });
+
+
+
+        chatCompletionStream.on('error', (error) => {
+
+            console.log("[CONVERSATION STREAM ERROR]", error);
+
+            res.status(500).json({ error: "Something went wrong with the stream." });
+
+        });
+
+
 
     } catch (error) {
+
         console.log("[CONVERSATION POST ERROR]", error);
+
         return res.status(500).json({ error: "Something went wrong." });
+
     }
+
 }
