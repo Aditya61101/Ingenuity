@@ -41,26 +41,104 @@ const Conversation = () => {
 
   const isLoading = form.formState.isSubmitting;
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      const userMessage: ChatCompletionUserMessageParam = { role: "user", content: values.prompt };
-      const newMessages = [...messages, userMessage];
+const onSubmit = async (values: z.infer<typeof formSchema>) => {
 
-      const api = apiCall(user);
-      const response = await api.post("conversation", { messages: newMessages });
-      setMessages((current) => [...current, userMessage, response.data]);
+  try {
 
-      queryClient.invalidateQueries({ queryKey: ['user-status'] });
-      form.reset();
-    } catch (error: any) {
-      console.error('error', error);
-      if (error?.response?.status === 403) {
-        dispatch(openModal());
-      } else {
-        toast.error("Something went wrong.");
+    const userMessage: ChatCompletionUserMessageParam = { role: "user", content: values.prompt };
+
+    const newMessages = [...messages, userMessage];
+
+
+
+    const api = apiCall(user);
+
+    const response = await api.post("conversation", { messages: newMessages }, { responseType: 'stream' });
+
+
+
+    const reader = response.data.getReader();
+
+    const decoder = new TextDecoder('utf-8');
+
+    let botMessage = { role: "bot", content: "" };
+
+
+
+    const processStream = async () => {
+
+      while (true) {
+
+        const { done, value } = await reader.read();
+
+        if (done) break;
+
+        botMessage.content += decoder.decode(value, { stream: true });
+
+        setMessages((current) => [...current.slice(0, -1), botMessage]);
+
       }
+
+    };
+
+
+
+    await processStream();
+
+    setMessages((current) => [...current, userMessage, botMessage]);
+
+
+
+    queryClient.invalidateQueries({ queryKey: ['user-status'] });
+
+    form.reset();
+
+  } catch (error: any) {
+
+    console.error('error', error);
+
+    if (error?.response?.status === 403) {
+
+      dispatch(openModal());
+
+    } else {
+
+      toast.error("Something went wrong.");
+
     }
+
   }
+
+}
+
+
+    await processStream();
+
+    setMessages((current) => [...current, userMessage, botMessage]);
+
+
+
+    queryClient.invalidateQueries({ queryKey: ['user-status'] });
+
+    form.reset();
+
+  } catch (error: any) {
+
+    console.error('error', error);
+
+    if (error?.response?.status === 403) {
+
+      dispatch(openModal());
+
+    } else {
+
+      toast.error("Something went wrong.");
+
+    }
+
+  }
+
+}
 
   return (
     <div>
