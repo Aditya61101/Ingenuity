@@ -41,59 +41,174 @@ const Conversation = () => {
 
   const isLoading = form.formState.isSubmitting;
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      const userMessage: ChatCompletionUserMessageParam = { role: "user", content: values.prompt };
-      const newMessages = [...messages, userMessage];
+const onSubmit = async (values: z.infer<typeof formSchema>) => {
 
-      const api = apiCall(user);
-      const response = await api.post("conversation", { messages: newMessages });
-      setMessages((current) => [...current, userMessage, response.data]);
 
-      queryClient.invalidateQueries({ queryKey: ['user-status'] });
-      form.reset();
-    } catch (error: any) {
-      console.error('error', error);
-      if (error?.response?.status === 403) {
-        dispatch(openModal());
-      } else {
-        toast.error("Something went wrong.");
+
+  try {
+
+
+
+    const userMessage: ChatCompletionUserMessageParam = { role: "user", content: values.prompt };
+
+
+
+    const newMessages = [...messages, userMessage];
+
+
+
+
+
+
+
+    const api = apiCall(user);
+
+
+
+    const response = await api.post("conversation", { messages: newMessages }, { responseType: 'stream' });
+
+
+
+
+
+
+
+    const reader = response.data.getReader();
+
+
+
+    const decoder = new TextDecoder("utf-8");
+
+
+
+    let botMessage = "";
+
+
+
+
+
+
+
+    const processStream = async () => {
+
+
+
+      while (true) {
+
+
+
+        const { done, value } = await reader.read();
+
+
+
+        if (done) break;
+
+
+
+        const chunk = decoder.decode(value, { stream: true });
+
+
+
+        botMessage += chunk;
+
+
+
+        setMessages((current) => {
+
+          const lastMessage = current[current.length - 1];
+
+          if (lastMessage && lastMessage.role === "bot") {
+
+            lastMessage.content += chunk;
+
+            return [...current.slice(0, -1), lastMessage];
+
+          }
+
+          return [...current, { role: "bot", content: chunk }];
+
+        });
+
+
+
       }
+
+
+
+    };
+
+
+
+
+
+
+
+    await processStream();
+
+
+
+
+
+
+
+    queryClient.invalidateQueries({ queryKey: ['user-status'] });
+
+
+
+    form.reset();
+
+
+
+  } catch (error: any) {
+
+
+
+    console.error('error', error);
+
+
+
+    if (error?.response?.status === 403) {
+
+
+
+      dispatch(openModal());
+
+
+
+    } else {
+
+
+
+      toast.error("Something went wrong.");
+
+
+
     }
+
+
+
   }
 
-  return (
-    <div>
-      <Heading
-        title="Conversation"
-        description="Our most advanced conversation model!"
-        icon={MessageSquare}
-        iconColor="text-violet-500"
-        bgColor="bg-violet-500/10"
-      />
-      <div className="px-4 lg:px-8">
-        <div>
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="
-                border 
-                rounded-lg
-                w-full 
-                p-4 
-                px-3 
-                md:px-6 
-                focus-within:shadow-sm
-                grid
-                grid-cols-12
-                gap-2
-              "
-            >
-              <FormField
-                name="prompt"
-                render={({ field }) => (
-                  <FormItem className="col-span-12 lg:col-span-10">
-                    <FormControl className="m-0 p-0">
+
+
+}
+    } else {
+
+
+
+      toast.error("Something went wrong.");
+
+
+
+    }
+
+
+
+  }
+
+
+
+}
                       <Input
                         className="border-0 outline-none focus-visible:ring-0 focus-visible:ring-transparent"
                         disabled={isLoading}
