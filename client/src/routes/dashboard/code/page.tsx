@@ -43,26 +43,69 @@ const CodePage = () => {
 
   const isLoading = form.formState.isSubmitting;
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      const userMessage: ChatCompletionUserMessageParam = { role: "user", content: values.prompt };
-      const newMessages = [...messages, userMessage];
+const onSubmit = async (values: z.infer<typeof formSchema>) => {
 
-      const api = apiCall(user);
-      const response = await api.post("code", { messages: newMessages });
-      setMessages((current) => [...current, userMessage, response.data]);
-      
-      queryClient.invalidateQueries({ queryKey: ['user-status'] });
-      form.reset();
-    } catch (error: any) {
-      console.error('error', error);
-      if (error?.response?.status === 403) {
-        dispatch(openModal());
-      } else {
-        toast.error("Something went wrong.");
-      }
+  try {
+
+    const userMessage: ChatCompletionUserMessageParam = { role: "user", content: values.prompt };
+
+    const newMessages = [...messages, userMessage];
+
+
+
+    const api = apiCall(user);
+
+    const response = await api.post("code", { messages: newMessages }, { responseType: 'stream' });
+
+
+
+    const reader = response.data.getReader();
+
+    const decoder = new TextDecoder('utf-8');
+
+    let done = false;
+
+    let botMessage = { role: "assistant", content: "" };
+
+
+
+    while (!done) {
+
+      const { value, done: readerDone } = await reader.read();
+
+      done = readerDone;
+
+      const chunk = decoder.decode(value, { stream: true });
+
+      botMessage.content += chunk;
+
+      setMessages((current) => [...current.slice(0, -1), botMessage]);
+
     }
+
+
+
+    queryClient.invalidateQueries({ queryKey: ['user-status'] });
+
+    form.reset();
+
+  } catch (error: any) {
+
+    console.error('error', error);
+
+    if (error?.response?.status === 403) {
+
+      dispatch(openModal());
+
+    } else {
+
+      toast.error("Something went wrong.");
+
+    }
+
   }
+
+}
 
   return (
     <div>
